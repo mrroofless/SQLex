@@ -13,4 +13,8 @@
 -  <a href="http://sql-ex.ru/exercises.php?N=-15">Задача -15</a> - <a href="https://github.com/mrroofless/SQLex/blob/master/-15">Решение</a> 
 
 На 4 балла:
--  <a href="http://sql-ex.ru/exercises/index.php?act=learn&LN=117">Задача 117</a> - <a href="https://github.com/mrroofless/SQLex/blob/master/117">Решение</a> 
+-  <a href="http://sql-ex.ru/exercises/index.php?act=learn&LN=99">Задача 99</a> - <a href="https://github.com/mrroofless/SQLex/blob/master/99">Решение</a> 
+-  <a href="http://sql-ex.ru/exercises/index.php?act=learn&LN=99">Задача 91</a> - <a href="https://github.com/mrroofless/SQLex/blob/master/91">Решение</a> 
+-  <a href="http://sql-ex.ru/exercises/index.php?act=learn&LN=99">Задача 127</a> - <a href="https://github.com/mrroofless/SQLex/blob/master/127">Решение</a> 
+-  <a href="http://sql-ex.ru/exercises/index.php?act=learn&LN=99">Задача 123</a> - <a href="https://github.com/mrroofless/SQLex/blob/master/123">Решение</a> 
+-  <a href="http://sql-ex.ru/exercises/index.php?act=learn&LN=99">Задача 125</a> - <a href="https://github.com/mrroofless/SQLex/blob/master/125">Решение</a> 
