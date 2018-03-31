@@ -1,1 +1,9 @@
-
+select distinct country, value,  name 
+from (
+  select country, value, max(value) over (partition by country) maxvalue, name from classes 
+    cross apply
+  (VALUES(numguns*5000, 'numguns')
+        ,(bore*3000, 'bore')
+        ,(displacement, 'displacement')
+   )  spec(value, name)) as a
+where value = maxvalue
