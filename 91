@@ -1,1 +1,18 @@
+WITH tableA AS (
 
+select B_Q_ID, sum(B_VOL) as B_VOL from utB
+group by B_Q_ID
+
+UNION ALL
+
+SELECT Q.Q_ID,
+NULL
+        FROM utQ AS Q
+               LEFT JOIN utB AS B
+                      ON Q.Q_ID = B.B_Q_ID
+
+GROUP BY Q.Q_ID
+HAVING SUM(B.B_VOL) IS NULL
+)
+
+SELECT CAST(AVG(CAST(B_VOL as float)) AS DEC(15,2)) as avg_value from tableA
