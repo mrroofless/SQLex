@@ -1,29 +1,33 @@
-WITH tableA AS (
- SELECT point,
-        date AS money_in_date,
-        date AS money_out_date,
-        CASE WHEN date IN (SELECT date 
-                           FROM Outcome_o AS a 
-                           WHERE a.point = b.point)
-             THEN 0
-             ELSE 1
-        END as target_day
- FROM Income_o AS b
- UNION ALL
- SELECT c.point, 
-        c.money_in_date, 
-        DATEADD(day, 1, c.money_out_date),
-        CASE WHEN DATENAME(dw, DATEADD(day, 1, c.money_out_date)) = 'Sunday' OR
-                  DATEADD(day, 1, c.money_out_date) IN (SELECT date 
-                                                FROM Outcome_o AS o
-                                                WHERE o.point = c.point)
-             THEN 0
-             ELSE 1
-        END
- FROM tableA AS c
- WHERE target_day = 0
-)
+WITH rslt AS
+(
+ select point, date as in_money_date, date as out_money_date,
+       CASE WHEN NOT EXISTS(
+                 select 1 from outcome_o AS out
+                  where out.point = inc.point and out.date  = inc.date)
+                 THEN 1
+                 ELSE 0
+       END AS true_rslt
+ from income_o AS inc  -- правило 1
 
-SELECT point, money_in_date, money_out_date
-FROM tableA
-WHERE target_day = 1
+ union all
+
+ select c.point, c.in_money_date, 
+        DATEADD(dd, 1, c.out_money_date) as out_money_date,
+        CASE           
+             WHEN DATENAME(dw, DATEADD(day, 1, c.out_money_date)) = 'Sunday' -- исключаем воскресенья
+                THEN 0
+             WHEN EXISTS(
+                   select 1 from outcome_o o
+                   where o.point = c.point
+                     and o.date = DATEADD(dd, 1, c.out_money_date)
+                   )
+                THEN 0              -- правило 2 исключаем выдачу денег
+                ELSE 1
+        END AS true_rslt
+        from rslt AS c
+        where NOT (c.true_rslt = 1)
+)
+select point, in_money_date, out_money_date
+from rslt
+where true_rslt = 1
+order by point, in_money_date, out_money_date
