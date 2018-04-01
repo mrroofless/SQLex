@@ -1,1 +1,6 @@
-
+--не работает на проверочной базе
+select B_DATETIME AS T,
+cast(MAX(round(CAST(B_VOL AS FLOAT)*CAST(B_VOL AS FLOAT)*PI(),0)) as varchar) AS Area
+from
+utB
+GROUP BY B_DATETIME
