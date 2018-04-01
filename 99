@@ -1,40 +1,29 @@
---читерство, решено на оракле
+WITH rectable AS (
+ SELECT point,
+        date AS inc_date,
+        date AS try_date,
+        CASE WHEN date IN (SELECT date 
+                           FROM Outcome_o o 
+                           WHERE o.point=i.point)
+             THEN 0
+             ELSE 1
+        END as good
+ FROM Income_o i
+ UNION ALL
+ SELECT r.point, 
+        r.inc_date, 
+        DATEADD(day,1,r.try_date),
+        CASE WHEN DATENAME(dw,DATEADD(day,1,r.try_date))='Sunday' OR
+                  DATEADD(day,1,r.try_date) IN (SELECT date 
+                                                FROM Outcome_o o
+                                                WHERE o.point=r.point)
+             THEN 0
+             ELSE 1
+        END
+ FROM rectable r
+ WHERE good=0
+)
 
-select point,
-       "date" income_date,
-       "date" + nvl(
-                  min(case when diff > cnt then cnt else null end),
-                  max(cnt)+1
-                ) incass_date
-from (select i.point,
-             i."date",
-             (trunc(o."date") - trunc(i."date")) diff, -- разница дней
-             -- количество запрещенных для инкассации дней после прихода и до текущего запрещенного дня
-             count(1) over (partition by i.point, i."date" order by o."date" rows between unbounded preceding and current row)-1 cnt
-      from income_o i
-               join (select point, "date", 1 disabled from outcome_o
-                     union
-                     select point, trunc("date"+7,'DAY'), 1 disabled from income_o) o
-                 on i.point = o.point
-      where o."date" > = i."date")
-group by point, "date"
-
-
---несовпадение данных
-   select point,
-       date income_date,   
-	   date + isnull(
-                  min(case when diff > cnt then cnt else null end),
-                  max(cnt)+1
-                ) incass_date
-from (select i.point,
-             i.date,
-             (o.date - i.date) as diff, -- разница дней            
-             count(1) over (partition by i.point, i.date order by o.date rows between unbounded preceding and current row)-1 cnt -- количество запрещенных для инкассации дней после прихода и до текущего запрещенного дня
-      from income_o i
-               join (select point, date, 1 disabled from outcome_o
-                     union
-                     select point, Dateadd(D, 7, date), 1 disabled from income_o) as o
-                 on i.point = o.point
-      where o.date > = i.date) as abc
-group by point, date
+SELECT point, inc_date, try_date
+FROM rectable
+WHERE good=1
