@@ -18,3 +18,23 @@ from (select i.point,
                  on i.point = o.point
       where o."date" > = i."date")
 group by point, "date"
+
+
+--несовпадение данных
+   select point,
+       date income_date,   
+	   date + isnull(
+                  min(case when diff > cnt then cnt else null end),
+                  max(cnt)+1
+                ) incass_date
+from (select i.point,
+             i.date,
+             (o.date - i.date) as diff, -- разница дней            
+             count(1) over (partition by i.point, i.date order by o.date rows between unbounded preceding and current row)-1 cnt -- количество запрещенных для инкассации дней после прихода и до текущего запрещенного дня
+      from income_o i
+               join (select point, date, 1 disabled from outcome_o
+                     union
+                     select point, Dateadd(D, 7, date), 1 disabled from income_o) as o
+                 on i.point = o.point
+      where o.date > = i.date) as abc
+group by point, date
