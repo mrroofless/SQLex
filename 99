@@ -1,29 +1,29 @@
-WITH rectable AS (
+WITH tableA AS (
  SELECT point,
-        date AS inc_date,
-        date AS try_date,
+        date AS money_in_date,
+        date AS money_out_date,
         CASE WHEN date IN (SELECT date 
-                           FROM Outcome_o o 
-                           WHERE o.point=i.point)
+                           FROM Outcome_o AS a 
+                           WHERE a.point = b.point)
              THEN 0
              ELSE 1
-        END as good
- FROM Income_o i
+        END as target_day
+ FROM Income_o AS b
  UNION ALL
- SELECT r.point, 
-        r.inc_date, 
-        DATEADD(day,1,r.try_date),
-        CASE WHEN DATENAME(dw,DATEADD(day,1,r.try_date))='Sunday' OR
-                  DATEADD(day,1,r.try_date) IN (SELECT date 
-                                                FROM Outcome_o o
-                                                WHERE o.point=r.point)
+ SELECT c.point, 
+        c.money_in_date, 
+        DATEADD(day, 1, c.money_out_date),
+        CASE WHEN DATENAME(dw, DATEADD(day, 1, c.money_out_date)) = 'Sunday' OR
+                  DATEADD(day, 1, c.money_out_date) IN (SELECT date 
+                                                FROM Outcome_o AS o
+                                                WHERE o.point = c.point)
              THEN 0
              ELSE 1
         END
- FROM rectable r
- WHERE good=0
+ FROM tableA AS c
+ WHERE target_day = 0
 )
 
-SELECT point, inc_date, try_date
-FROM rectable
-WHERE good=1
+SELECT point, money_in_date, money_out_date
+FROM tableA
+WHERE target_day = 1
